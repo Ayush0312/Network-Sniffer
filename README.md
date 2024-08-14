@@ -1,27 +1,36 @@
-# Network-Sniffer
+from scapy.all import sniff, Ether, IP, TCP, UDP
 
-## Overview
+# Packet callback function
+def packet_callback(packet):
+    # Check if the packet has an Ethernet layer
+    if packet.haslayer(Ether):
+        print("Ethernet Frame:")
+        print(f"  Source MAC: {packet[Ether].src}")
+        print(f"  Destination MAC: {packet[Ether].dst}")
 
-This Python project is a basic network sniffer that captures and analyzes network traffic. The sniffer is built using the `Scapy` library, which provides powerful packet manipulation capabilities. The sniffer captures Ethernet frames, IP packets, and checks for both TCP and UDP segments, displaying relevant information for each captured packet.
+    # Check if the packet has an IP layer
+    if packet.haslayer(IP):
+        print("\nIP Packet:")
+        print(f"  Source IP: {packet[IP].src}")
+        print(f"  Destination IP: {packet[IP].dst}")
+        print(f"  Protocol: {packet[IP].proto}")
 
-## Features
+        # Check for TCP packets
+        if packet.haslayer(TCP):
+            print("\nTCP Segment:")
+            print(f"  Source Port: {packet[TCP].sport}")
+            print(f"  Destination Port: {packet[TCP].dport}")
+            print(f"  Sequence Number: {packet[TCP].seq}")
+            print(f"  Acknowledgment Number: {packet[TCP].ack}")
 
-- **Ethernet Frame Analysis**: Captures and displays source and destination MAC addresses.
-- **IP Packet Analysis**: Captures and displays source and destination IP addresses, and the protocol used.
-- **TCP Segment Analysis**: Captures and displays source and destination ports for TCP packets.
-- **UDP Datagram Analysis**: Captures and displays source and destination ports for UDP packets.
+        # Check for UDP packets
+        elif packet.haslayer(UDP):
+            print("\nUDP Datagram:")
+            print(f"  Source Port: {packet[UDP].sport}")
+            print(f"  Destination Port: {packet[UDP].dport}")
 
-## Requirements
+    print("\n" + "-"*50 + "\n")
 
-To run this network sniffer, you need the following:
-
-- Python 3.x
-- `Scapy` library
-
-## Installation
-
-1. **Clone the repository**:
-
-   ```bash
-   git clone https://github.com/Ayush0312/Network-Sniffer.git
-  
+# Start sniffing
+print("Starting network sniffer...")
+sniff(prn=packet_callback, store=0)
